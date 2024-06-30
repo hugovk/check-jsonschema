@@ -174,6 +174,27 @@
       },
       "default": null
     },
+    "autodiscoverRepoOrder": {
+      "description": "The order method for autodiscover server side repository search.",
+      "type": "string",
+      "enum": [
+        "asc",
+        "desc"
+      ],
+      "default": null
+    },
+    "autodiscoverRepoSort": {
+      "description": "The sort method for autodiscover server side repository search.",
+      "type": "string",
+      "enum": [
+        "alpha",
+        "created",
+        "updated",
+        "size",
+        "id"
+      ],
+      "default": null
+    },
     "autodiscoverTopics": {
       "description": "Filter the list of autodiscovered repositories by topics.",
       "type": "array",
@@ -284,7 +305,7 @@
       "type": "object",
       "default": {
         "fileMatch": [
-          "(^|/)WORKSPACE(|\\.bazel)$",
+          "(^|/)WORKSPACE(|\\.bazel|\\.bzlmod)$",
           "\\.bzl$"
         ]
       },
@@ -944,7 +965,7 @@
     "dockerSidecarImage": {
       "description": "Change this value to override the default Renovate sidecar image.",
       "type": "string",
-      "default": "ghcr.io/containerbase/sidecar:10.5.0"
+      "default": "ghcr.io/containerbase/sidecar:10.12.0"
     },
     "dockerUser": {
       "description": "Set the `UID` and `GID` for Docker-based binaries if you use `binarySource=docker`.",
@@ -1003,6 +1024,10 @@
       "type": "object",
       "default": null,
       "$ref": "#"
+    },
+    "encryptedWarning": {
+      "description": "Warning text to use if encrypted config is found.",
+      "type": "string"
     },
     "endpoint": {
       "description": "Custom endpoint to use.",
@@ -1155,7 +1180,8 @@
       "type": "object",
       "default": {
         "fileMatch": [
-          "(^|/)\\.fvm/fvm_config\\.json$"
+          "(^|/)\\.fvm/fvm_config\\.json$",
+          "(^|/)\\.fvmrc$"
         ],
         "versioning": "semver"
       },
@@ -1668,7 +1694,7 @@
       "default": []
     },
     "inheritConfig": {
-      "description": "If `true`, Renovate will inherit configuration from the `inheritConfigFileName` file in `inheritConfigRepoName",
+      "description": "If `true`, Renovate will inherit configuration from the `inheritConfigFileName` file in `inheritConfigRepoName`.",
       "type": "boolean",
       "default": false
     },
@@ -1683,7 +1709,7 @@
       "default": "{{parentOrg}}/renovate-config"
     },
     "inheritConfigStrict": {
-      "description": "If `true`, any `inheritedConfig` fetch errror will result in an aborted run.",
+      "description": "If `true`, any `inheritedConfig` fetch error will result in an aborted run.",
       "type": "boolean",
       "default": false
     },
@@ -1865,7 +1891,8 @@
       "default": {
         "fileMatch": [
           "(^|/|\\.)pom\\.xml$",
-          "^(((\\.mvn)|(\\.m2))/)?settings\\.xml$"
+          "^(((\\.mvn)|(\\.m2))/)?settings\\.xml$",
+          "(^|/)\\.mvn/extensions\\.xml$"
         ],
         "versioning": "maven"
       },
@@ -1881,6 +1908,36 @@
         "versioning": "maven"
       },
       "$ref": "#"
+    },
+    "mergeConfidenceDatasources": {
+      "description": "If set, Renovate will query the merge-confidence JSON API only for datasources that are part of this list.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "go",
+          "maven",
+          "npm",
+          "nuget",
+          "packagist",
+          "pypi",
+          "rubygems"
+        ]
+      },
+      "default": [
+        "go",
+        "maven",
+        "npm",
+        "nuget",
+        "packagist",
+        "pypi",
+        "rubygems"
+      ]
+    },
+    "mergeConfidenceEndpoint": {
+      "description": "If set, Renovate will query this API for Merge Confidence data.",
+      "type": "string",
+      "default": "https://developer.mend.io/"
     },
     "meteor": {
       "description": "Configuration object for the meteor manager",
@@ -1937,6 +1994,15 @@
         "versioning": "hex"
       },
       "$ref": "#"
+    },
+    "mode": {
+      "description": "Mode of operation.",
+      "type": "string",
+      "enum": [
+        "full",
+        "silent"
+      ],
+      "default": "full"
     },
     "nix": {
       "description": "Configuration object for the nix manager",
@@ -2115,7 +2181,7 @@
                 "description": "A version range or regex pattern capturing allowed versions for dependencies.",
                 "type": "string"
               },
-              "customChangelogUrl": {
+              "changelogUrl": {
                 "description": "If set, Renovate will use this URL to fetch changelogs for a matched dependency. Valid only within a `packageRules` object.",
                 "type": "string"
               },
@@ -2280,7 +2346,7 @@
                 "type": "string"
               },
               "matchCurrentValue": {
-                "description": "A regex to match against the raw `currentValue` string of a dependency. Valid only within a `packageRules` object.",
+                "description": "A regex or glob pattern to match against the raw `currentValue` string of a dependency. Valid only within a `packageRules` object.",
                 "type": "string"
               },
               "matchCurrentVersion": {
@@ -2381,7 +2447,7 @@
                 ]
               },
               "matchNewValue": {
-                "description": "A regex to match against the raw `newValue` string of a dependency. Valid only within a `packageRules` object.",
+                "description": "A regex or glob pattern to match against the raw `newValue` string of a dependency. Valid only within a `packageRules` object.",
                 "type": "string"
               },
               "matchPackageNames": {
@@ -2508,6 +2574,11 @@
                   }
                 ]
               },
+              "prPriority": {
+                "description": "Set sorting priority for PR creation. PRs with higher priority are created first, negative priority last.",
+                "type": "integer",
+                "default": 0
+              },
               "replacementName": {
                 "description": "The name of the new dependency that replaces the old deprecated dependency.",
                 "type": "string"
@@ -2519,6 +2590,14 @@
               },
               "replacementVersion": {
                 "description": "The version of the new dependency that replaces the old deprecated dependency.",
+                "type": "string"
+              },
+              "sourceDirectory": {
+                "description": "The source directory in which the package is present at its source.",
+                "type": "string"
+              },
+              "sourceUrl": {
+                "description": "The source URL of the package.",
                 "type": "string"
               }
             }
@@ -2839,11 +2918,6 @@
       "type": "integer",
       "default": 25
     },
-    "prPriority": {
-      "description": "Set sorting priority for PR creation. PRs with higher priority are created first, negative priority last.",
-      "type": "integer",
-      "default": 0
-    },
     "prTitle": {
       "description": "Pull Request title template. Inherits from `commitMessage` if null.",
       "type": "string",
@@ -3133,6 +3207,17 @@
       },
       "$ref": "#"
     },
+    "runtime-version": {
+      "description": "Configuration object for the runtime-version manager",
+      "type": "object",
+      "default": {
+        "fileMatch": [
+          "(^|/)runtime.txt$"
+        ],
+        "pinDigests": false
+      },
+      "$ref": "#"
+    },
     "sbt": {
       "description": "Configuration object for the sbt manager",
       "type": "object",
@@ -3265,7 +3350,6 @@
           "branchAutomergeFailure",
           "configErrorIssue",
           "dependencyLookupWarnings",
-          "deprecationWarningIssues",
           "lockFileErrors",
           "missingCredentialsError",
           "onboardingClose",
@@ -3273,9 +3357,7 @@
           "prIgnoreNotification"
         ]
       },
-      "default": [
-        "deprecationWarningIssues"
-      ]
+      "default": []
     },
     "swift": {
       "description": "Configuration object for the swift manager",
@@ -3422,6 +3504,11 @@
       "type": "boolean",
       "default": true
     },
+    "userAgent": {
+      "description": "If set to any string, Renovate will use this as the `user-agent` it sends with HTTP requests.",
+      "type": "string",
+      "default": null
+    },
     "userStrings": {
       "description": "User-facing strings for the Renovate comment when a PR is closed.",
       "type": "object",
@@ -3478,6 +3565,7 @@
             "debian",
             "docker",
             "git",
+            "glasskube",
             "go-mod-directive",
             "gradle",
             "hashicorp",
@@ -3501,6 +3589,7 @@
             "rez",
             "rpm",
             "ruby",
+            "same-major",
             "semver",
             "semver-coerced",
             "swift",
