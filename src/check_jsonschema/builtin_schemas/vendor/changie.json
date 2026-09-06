@@ -29,7 +29,7 @@
         },
         "type": {
           "type": "string",
-          "description": "Specifies the type of choice which changes the prompt.\n\n| value | description | options\n| -- | -- | -- |\nstring | Freeform text | [minLength](#custom-minlength) and [maxLength](#custom-maxlength)\nblock | Multiline text | [minLength](#custom-minlength) and [maxLength](#custom-maxlength)\nint | Whole numbers | [minInt](#custom-minint) and [maxInt](#custom-maxint)\nenum | Limited set of strings | [enumOptions](#custom-enumoptions) is used to specify values"
+          "description": "Specifies the type of choice which changes the prompt.\n\n| value | description | options\n| -- | -- | -- |\nstring | Freeform text | [minLength](#custom-minlength) and [maxLength](#custom-maxlength)\nblock | Multiline text | [minLength](#custom-minlength) and [maxLength](#custom-maxlength)\nint | Whole numbers | [minInt](#custom-minint) and [maxInt](#custom-maxint)\nenum | Limited set of strings | [enumOptions](#custom-enumoptions) is used to specify values\nenums | Multiple values from a limited set of strings | [enumOptions](#custom-enumoptions) is used to specify values"
         },
         "optional": {
           "type": "boolean",
@@ -60,7 +60,7 @@
             "type": "string"
           },
           "type": "array",
-          "description": "When using the enum type, you must also specify what possible options to allow.\nUsers will be given a selection list to select the value they want."
+          "description": "When using the enum or enums type, you must also specify what possible options to allow.\nUsers will be given a selection list to select the value, or values, they want."
         }
       },
       "additionalProperties": false,
@@ -117,7 +117,7 @@
         },
         "auto": {
           "type": "string",
-          "description": "Auto determines what value to bump when using `batch auto` or `next auto`.\nPossible values are major, minor, patch or none and the highest one is used if\nmultiple changes are found. none will not bump the version.\nOnly none changes is not a valid bump and will fail to batch.\nexample: yaml\nauto: minor"
+          "description": "Auto determines what value to bump when using `batch auto` or `next auto`.\nPossible values are major, minor, patch or none and the highest one is used if\nmultiple changes are found. none will not bump the version.\nOnly none changes is not a valid bump and will fail to batch.\nAuto also supports go templates using the change as the template data, so the\nlevel can be calculated from custom values. The rendered value must be one of\nthe possible values listed above.\nexample: yaml\nauto: '{{if eq .Custom.Breaking \"Yes\"}}major{{else}}patch{{end}}'"
         }
       },
       "additionalProperties": false,
@@ -420,8 +420,6 @@
   "required": [
     "changesDir",
     "unreleasedDir",
-    "headerPath",
-    "changelogPath",
     "versionExt",
     "changeFormat"
   ],

@@ -101,7 +101,12 @@
               "type": "null"
             }
           ],
-          "default": null
+          "configuration_deprecated_attribute": {
+            "deprecated_summary_ghes_mode": "The `github_actions` action will be removed on 2027-03-31: https://docs.mergify.com/workflow/actions/migrate-github-actions/",
+            "deprecated_summary_saas_mode": "The `github_actions` action will be removed on 2027-03-31: https://docs.mergify.com/workflow/actions/migrate-github-actions/"
+          },
+          "default": null,
+          "deprecated": true
         },
         "label": {
           "anyOf": [
@@ -225,10 +230,16 @@
       "properties": {
         "users": {
           "items": {
-            "description": "A string template using the Jinja2 syntax.",
-            "format": "template",
-            "title": "Template",
-            "type": "string"
+            "description": "A string with `{{ variable }}` placeholders. Allowed variables: `author`.",
+            "format": "simple-template",
+            "title": "User",
+            "type": "string",
+            "x-mergify-template-variables": [
+              {
+                "description": "The pull request author's login.",
+                "name": "author"
+              }
+            ]
           },
           "maxItems": 10,
           "title": "Users",
@@ -236,10 +247,16 @@
         },
         "add_users": {
           "items": {
-            "description": "A string template using the Jinja2 syntax.",
-            "format": "template",
-            "title": "Template",
-            "type": "string"
+            "description": "A string with `{{ variable }}` placeholders. Allowed variables: `author`.",
+            "format": "simple-template",
+            "title": "User",
+            "type": "string",
+            "x-mergify-template-variables": [
+              {
+                "description": "The pull request author's login.",
+                "name": "author"
+              }
+            ]
           },
           "maxItems": 10,
           "title": "Add Users",
@@ -247,10 +264,16 @@
         },
         "remove_users": {
           "items": {
-            "description": "A string template using the Jinja2 syntax.",
-            "format": "template",
-            "title": "Template",
-            "type": "string"
+            "description": "A string with `{{ variable }}` placeholders. Allowed variables: `author`.",
+            "format": "simple-template",
+            "title": "User",
+            "type": "string",
+            "x-mergify-template-variables": [
+              {
+                "description": "The pull request author's login.",
+                "name": "author"
+              }
+            ]
           },
           "maxItems": 40,
           "title": "Remove Users",
@@ -294,11 +317,16 @@
         "bot_account": {
           "anyOf": [
             {
-              "const": "{{ author }}",
-              "title": "Pull request author"
-            },
-            {
-              "type": "string"
+              "description": "A string with `{{ variable }}` placeholders. Allowed variables: `author`.",
+              "format": "simple-template",
+              "title": "Bot account",
+              "type": "string",
+              "x-mergify-template-variables": [
+                {
+                  "description": "The pull request author's login.",
+                  "name": "author"
+                }
+              ]
             },
             {
               "type": "null"
@@ -334,12 +362,22 @@
           "type": "boolean"
         },
         "assignees": {
-          "description": "Users to assign the newly created pull request to. As the type is a data type template, you could use, e.g., `{{author}}` to assign the pull request to its original author.",
+          "description": "Users to assign the newly created pull request to. Accepts a GitHub login, or `{{ author }}` (the original pull request author) or `{{ merged_by }}` (the user who merged it).",
           "items": {
-            "description": "A string template using the Jinja2 syntax.",
-            "format": "template",
-            "title": "Template",
-            "type": "string"
+            "description": "A string with `{{ variable }}` placeholders. Allowed variables: `author`, `merged_by`.",
+            "format": "simple-template",
+            "title": "Assignee",
+            "type": "string",
+            "x-mergify-template-variables": [
+              {
+                "description": "The pull request author's login.",
+                "name": "author"
+              },
+              {
+                "description": "The login of the user who merged the pull request.",
+                "name": "merged_by"
+              }
+            ]
           },
           "maxItems": 10,
           "title": "Assignees",
@@ -363,16 +401,72 @@
         "title": {
           "default": "{{ title }} (backport #{{ number }})",
           "description": "The pull request's title.",
-          "format": "template",
-          "title": "Template",
-          "type": "string"
+          "format": "simple-template",
+          "title": "Title template",
+          "type": "string",
+          "x-mergify-template-variables": [
+            {
+              "description": "The pull request title.",
+              "name": "title"
+            },
+            {
+              "description": "The pull request number.",
+              "name": "number"
+            },
+            {
+              "description": "The branch the pull request is copied to.",
+              "name": "destination_branch"
+            },
+            {
+              "description": "The base branch name.",
+              "name": "base"
+            },
+            {
+              "description": "The pull request author's login.",
+              "name": "author"
+            }
+          ]
         },
         "body": {
           "default": "{{ body }}<hr>This is an automatic backport of pull request #{{number}} done by [Mergify](https://mergify.com).\n",
           "description": "The pull request's body.",
-          "format": "template",
-          "title": "Template",
-          "type": "string"
+          "format": "simple-template",
+          "title": "Body template",
+          "type": "string",
+          "x-mergify-template-variables": [
+            {
+              "description": "The pull request title.",
+              "name": "title"
+            },
+            {
+              "description": "The pull request number.",
+              "name": "number"
+            },
+            {
+              "description": "The branch the pull request is copied to.",
+              "name": "destination_branch"
+            },
+            {
+              "description": "The base branch name.",
+              "name": "base"
+            },
+            {
+              "description": "The pull request author's login.",
+              "name": "author"
+            },
+            {
+              "description": "The pull request description (body).",
+              "name": "body"
+            },
+            {
+              "description": "The cherry-pick error message, when the copy hit a conflict (body only).",
+              "name": "cherry_pick_error"
+            },
+            {
+              "description": "The cherry-picked commit SHAs, newline-joined.",
+              "name": "cherry_picked_commits"
+            }
+          ]
         },
         "report_mode": {
           "default": [
@@ -380,11 +474,7 @@
           ],
           "description": "Reporting modes for the action's result. Check will create a check on the pull request, and comment will post a comment on the pull request.",
           "items": {
-            "enum": [
-              "check",
-              "comment"
-            ],
-            "type": "string"
+            "$ref": "#/$defs/ReportMode"
           },
           "minItems": 1,
           "title": "Report Mode",
@@ -404,6 +494,65 @@
       "title": "BackportActionModel",
       "type": "object"
     },
+    "BarrierFileFilters": {
+      "additionalProperties": false,
+      "properties": {
+        "include": {
+          "description": "Glob patterns of files that impact every scope. At least one pattern is required. Examples: ('.github/workflows/**', 'Makefile')",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Include",
+          "type": "array"
+        },
+        "exclude": {
+          "description": "Glob patterns of files to exclude from this scope. Evaluated after `include` and takes precedence. Examples: ('**/tests/**', '*.md')",
+          "items": {
+            "type": "string"
+          },
+          "title": "Exclude",
+          "type": "array"
+        }
+      },
+      "required": [
+        "include"
+      ],
+      "title": "BarrierFileFilters",
+      "type": "object"
+    },
+    "BatchSizeBounds": {
+      "anyOf": [
+        {
+          "maximum": 128,
+          "minimum": 1,
+          "type": "integer"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "min": {
+              "maximum": 128,
+              "minimum": 1,
+              "title": "Min",
+              "type": "integer"
+            },
+            "max": {
+              "maximum": 128,
+              "minimum": 1,
+              "title": "Max",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "min",
+            "max"
+          ],
+          "title": "BatchSizeBounds",
+          "type": "object"
+        }
+      ]
+    },
     "BranchName": {
       "description": "A Git branch name.",
       "properties": {},
@@ -415,10 +564,52 @@
       "properties": {
         "message": {
           "default": "This pull request has been automatically closed by Mergify.",
-          "description": "A string template using the Jinja2 syntax.",
-          "format": "template",
-          "title": "Template",
-          "type": "string"
+          "description": "A string with `{{ variable }}` placeholders. Allowed variables: `approvers`, `assignees`, `author`, `base`, `body`, `head`, `labels`, `number`, `queue_dequeue_reason`, `title`.",
+          "format": "simple-template",
+          "title": "Message template",
+          "type": "string",
+          "x-mergify-template-variables": [
+            {
+              "description": "The pull request author's login.",
+              "name": "author"
+            },
+            {
+              "description": "The pull request number.",
+              "name": "number"
+            },
+            {
+              "description": "The pull request title.",
+              "name": "title"
+            },
+            {
+              "description": "The pull request description (body).",
+              "name": "body"
+            },
+            {
+              "description": "The base branch name.",
+              "name": "base"
+            },
+            {
+              "description": "The head branch name.",
+              "name": "head"
+            },
+            {
+              "description": "The pull request's labels as a comma-separated list (e.g. `bug, feat`); empty when none.",
+              "name": "labels"
+            },
+            {
+              "description": "Assignees as a ready-to-use @mention list (e.g. `@alice, @bob`); empty when none.",
+              "name": "assignees"
+            },
+            {
+              "description": "Reviewers who approved, as a @mention list (e.g. `@alice, @bob`); empty when none.",
+              "name": "approvers"
+            },
+            {
+              "description": "Why the pull request left the merge queue; empty outside queue contexts.",
+              "name": "queue_dequeue_reason"
+            }
+          ]
         }
       },
       "title": "CloseActionModel",
@@ -504,7 +695,12 @@
               {
                 "or": [
                   "sender-permission >= write",
-                  "sender = {{author}}"
+                  {
+                    "and": [
+                      "sender = {{author}}",
+                      "from-fork"
+                    ]
+                  }
                 ]
               }
             ]
@@ -517,7 +713,12 @@
               {
                 "or": [
                   "sender-permission >= write",
-                  "sender = {{author}}"
+                  {
+                    "and": [
+                      "sender = {{author}}",
+                      "from-fork"
+                    ]
+                  }
                 ]
               }
             ]
@@ -538,7 +739,12 @@
               {
                 "or": [
                   "sender-permission >= write",
-                  "sender = {{author}}"
+                  {
+                    "and": [
+                      "sender = {{author}}",
+                      "from-fork"
+                    ]
+                  }
                 ]
               }
             ]
@@ -551,7 +757,12 @@
               {
                 "or": [
                   "sender-permission >= write",
-                  "sender = {{author}}"
+                  {
+                    "and": [
+                      "sender = {{author}}",
+                      "from-fork"
+                    ]
+                  }
                 ]
               }
             ]
@@ -567,10 +778,52 @@
         "message": {
           "anyOf": [
             {
-              "description": "A string template using the Jinja2 syntax.",
-              "format": "template",
-              "title": "Template",
-              "type": "string"
+              "description": "A string with `{{ variable }}` placeholders. Allowed variables: `approvers`, `assignees`, `author`, `base`, `body`, `head`, `labels`, `number`, `queue_dequeue_reason`, `title`.",
+              "format": "simple-template",
+              "title": "Message template",
+              "type": "string",
+              "x-mergify-template-variables": [
+                {
+                  "description": "The pull request author's login.",
+                  "name": "author"
+                },
+                {
+                  "description": "The pull request number.",
+                  "name": "number"
+                },
+                {
+                  "description": "The pull request title.",
+                  "name": "title"
+                },
+                {
+                  "description": "The pull request description (body).",
+                  "name": "body"
+                },
+                {
+                  "description": "The base branch name.",
+                  "name": "base"
+                },
+                {
+                  "description": "The head branch name.",
+                  "name": "head"
+                },
+                {
+                  "description": "The pull request's labels as a comma-separated list (e.g. `bug, feat`); empty when none.",
+                  "name": "labels"
+                },
+                {
+                  "description": "Assignees as a ready-to-use @mention list (e.g. `@alice, @bob`); empty when none.",
+                  "name": "assignees"
+                },
+                {
+                  "description": "Reviewers who approved, as a @mention list (e.g. `@alice, @bob`); empty when none.",
+                  "name": "approvers"
+                },
+                {
+                  "description": "Why the pull request left the merge queue; empty outside queue contexts.",
+                  "name": "queue_dequeue_reason"
+                }
+              ]
             },
             {
               "type": "null"
@@ -583,11 +836,16 @@
         "bot_account": {
           "anyOf": [
             {
-              "const": "{{ author }}",
-              "title": "Pull request author"
-            },
-            {
-              "type": "string"
+              "description": "A string with `{{ variable }}` placeholders. Allowed variables: `author`.",
+              "format": "simple-template",
+              "title": "Bot account",
+              "type": "string",
+              "x-mergify-template-variables": [
+                {
+                  "description": "The pull request author's login.",
+                  "name": "author"
+                }
+              ]
             },
             {
               "type": "null"
@@ -798,11 +1056,16 @@
         "bot_account": {
           "anyOf": [
             {
-              "const": "{{ author }}",
-              "title": "Pull request author"
-            },
-            {
-              "type": "string"
+              "description": "A string with `{{ variable }}` placeholders. Allowed variables: `author`.",
+              "format": "simple-template",
+              "title": "Bot account",
+              "type": "string",
+              "x-mergify-template-variables": [
+                {
+                  "description": "The pull request author's login.",
+                  "name": "author"
+                }
+              ]
             },
             {
               "type": "null"
@@ -838,12 +1101,22 @@
           "type": "boolean"
         },
         "assignees": {
-          "description": "Users to assign the newly created pull request to. As the type is a data type template, you could use, e.g., `{{author}}` to assign the pull request to its original author.",
+          "description": "Users to assign the newly created pull request to. Accepts a GitHub login, or `{{ author }}` (the original pull request author) or `{{ merged_by }}` (the user who merged it).",
           "items": {
-            "description": "A string template using the Jinja2 syntax.",
-            "format": "template",
-            "title": "Template",
-            "type": "string"
+            "description": "A string with `{{ variable }}` placeholders. Allowed variables: `author`, `merged_by`.",
+            "format": "simple-template",
+            "title": "Assignee",
+            "type": "string",
+            "x-mergify-template-variables": [
+              {
+                "description": "The pull request author's login.",
+                "name": "author"
+              },
+              {
+                "description": "The login of the user who merged the pull request.",
+                "name": "merged_by"
+              }
+            ]
           },
           "maxItems": 10,
           "title": "Assignees",
@@ -867,16 +1140,72 @@
         "title": {
           "default": "{{ title }} (copy #{{ number }})",
           "description": "The pull request's title.",
-          "format": "template",
-          "title": "Template",
-          "type": "string"
+          "format": "simple-template",
+          "title": "Title template",
+          "type": "string",
+          "x-mergify-template-variables": [
+            {
+              "description": "The pull request title.",
+              "name": "title"
+            },
+            {
+              "description": "The pull request number.",
+              "name": "number"
+            },
+            {
+              "description": "The branch the pull request is copied to.",
+              "name": "destination_branch"
+            },
+            {
+              "description": "The base branch name.",
+              "name": "base"
+            },
+            {
+              "description": "The pull request author's login.",
+              "name": "author"
+            }
+          ]
         },
         "body": {
           "default": "{{ body }}<hr>This is an automatic copy of pull request #{{number}} done by [Mergify](https://mergify.com).\n",
           "description": "The pull request's body.",
-          "format": "template",
-          "title": "Template",
-          "type": "string"
+          "format": "simple-template",
+          "title": "Body template",
+          "type": "string",
+          "x-mergify-template-variables": [
+            {
+              "description": "The pull request title.",
+              "name": "title"
+            },
+            {
+              "description": "The pull request number.",
+              "name": "number"
+            },
+            {
+              "description": "The branch the pull request is copied to.",
+              "name": "destination_branch"
+            },
+            {
+              "description": "The base branch name.",
+              "name": "base"
+            },
+            {
+              "description": "The pull request author's login.",
+              "name": "author"
+            },
+            {
+              "description": "The pull request description (body).",
+              "name": "body"
+            },
+            {
+              "description": "The cherry-pick error message, when the copy hit a conflict (body only).",
+              "name": "cherry_pick_error"
+            },
+            {
+              "description": "The cherry-picked commit SHAs, newline-joined.",
+              "name": "cherry_picked_commits"
+            }
+          ]
         },
         "report_mode": {
           "default": [
@@ -884,11 +1213,7 @@
           ],
           "description": "Reporting modes for the action's result. Check will create a check on the pull request, and comment will post a comment on the pull request.",
           "items": {
-            "enum": [
-              "check",
-              "comment"
-            ],
-            "type": "string"
+            "$ref": "#/$defs/ReportMode"
           },
           "minItems": 1,
           "title": "Report Mode",
@@ -1034,11 +1359,16 @@
         "bot_account": {
           "anyOf": [
             {
-              "const": "{{ author }}",
-              "title": "Pull request author"
-            },
-            {
-              "type": "string"
+              "description": "A string with `{{ variable }}` placeholders. Allowed variables: `author`.",
+              "format": "simple-template",
+              "title": "Bot account",
+              "type": "string",
+              "x-mergify-template-variables": [
+                {
+                  "description": "The pull request author's login.",
+                  "name": "author"
+                }
+              ]
             },
             {
               "type": "null"
@@ -1105,7 +1435,7 @@
       "description": "GitHub Actions workflow dispatch",
       "properties": {
         "workflow": {
-          "description": "The name of the .yaml GitHub Workflow file with its extension.",
+          "description": "The GitHub Workflow file name with its extension (e.g. `ci.yml`), or the numeric workflow id.",
           "title": "Workflow",
           "type": "string"
         },
@@ -1132,10 +1462,36 @@
                 "type": "boolean"
               },
               {
-                "description": "A string template using the Jinja2 syntax.",
-                "format": "template",
-                "title": "Template",
-                "type": "string"
+                "description": "A string with `{{ variable }}` placeholders. Allowed variables: `author`, `base`, `head`, `number`, `repository_full_name`, `title`.",
+                "format": "simple-template",
+                "title": "Workflow input template",
+                "type": "string",
+                "x-mergify-template-variables": [
+                  {
+                    "description": "The pull request author's login.",
+                    "name": "author"
+                  },
+                  {
+                    "description": "The pull request number.",
+                    "name": "number"
+                  },
+                  {
+                    "description": "The pull request title.",
+                    "name": "title"
+                  },
+                  {
+                    "description": "The base branch name.",
+                    "name": "base"
+                  },
+                  {
+                    "description": "The head branch name.",
+                    "name": "head"
+                  },
+                  {
+                    "description": "The repository's full name (`owner/repo`).",
+                    "name": "repository_full_name"
+                  }
+                ]
               }
             ]
           },
@@ -1187,9 +1543,6 @@
         "add": {
           "description": "The list of labels to add.",
           "items": {
-            "description": "A string template using the Jinja2 syntax.",
-            "format": "template",
-            "title": "Template",
             "type": "string"
           },
           "maxItems": 50,
@@ -1199,9 +1552,6 @@
         "remove": {
           "description": "The list of labels to remove.",
           "items": {
-            "description": "A string template using the Jinja2 syntax.",
-            "format": "template",
-            "title": "Template",
             "type": "string"
           },
           "maxItems": 50,
@@ -1217,9 +1567,6 @@
         "toggle": {
           "description": "Toggle labels in the list based on the conditions. If all the conditions are a success, all the labels in the list will be added, otherwise, they will all be removed.",
           "items": {
-            "description": "A string template using the Jinja2 syntax.",
-            "format": "template",
-            "title": "Template",
             "type": "string"
           },
           "maxItems": 50,
@@ -1283,11 +1630,16 @@
         "merge_bot_account": {
           "anyOf": [
             {
-              "const": "{{ author }}",
-              "title": "Pull request author"
-            },
-            {
-              "type": "string"
+              "description": "A string with `{{ variable }}` placeholders. Allowed variables: `author`.",
+              "format": "simple-template",
+              "title": "Bot account",
+              "type": "string",
+              "x-mergify-template-variables": [
+                {
+                  "description": "The pull request author's login.",
+                  "name": "author"
+                }
+              ]
             },
             {
               "type": "null"
@@ -1309,8 +1661,13 @@
               "type": "null"
             }
           ],
+          "configuration_deprecated_attribute": {
+            "deprecated_summary_ghes_mode": "`commit_message_template` is deprecated and will be removed on 2026-09-30. Use the declarative `commit_message_format` instead: https://docs.mergify.com/workflow/actions/merge#migrating-from-commit_message_template",
+            "deprecated_summary_saas_mode": "`commit_message_template` is deprecated and will be removed on 2026-09-30. Use the declarative `commit_message_format` instead: https://docs.mergify.com/workflow/actions/merge#migrating-from-commit_message_template"
+          },
           "default": null,
-          "description": "Template to use as the commit message when using the merge or squash merge method.",
+          "deprecated": true,
+          "description": "Template to use as the commit message when using the merge or squash merge method. Deprecated: use `commit_message_format` instead.",
           "title": "Commit Message Template"
         },
         "commit_message_format": {
@@ -1479,6 +1836,19 @@
           "description": "The label to add on pull requests when they are added to the merge queue.",
           "title": "Queued Label"
         },
+        "checking_label": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The label to add on pull requests while the merge queue is checking them, from the moment they enter a batch until they leave the queue. It stays on a pull request parked in a bisection, whose own CI has not started yet.",
+          "title": "Checking Label"
+        },
         "dequeued_label": {
           "anyOf": [
             {
@@ -1494,7 +1864,7 @@
         },
         "mode": {
           "default": "serial",
-          "description": "Defines how the merge queue schedules pull requests.\n- `serial`: PRs are tested cumulatively.\n- `parallel`: PRs whose scopes don't overlap are tested in parallel.\n- `isolated`: PRs are grouped into batches by changed-files similarity; each batch runs as a fully isolated car, with no dependency on any other batch.\n",
+          "description": "Defines how the merge queue schedules pull requests.\n- `serial`: PRs are tested cumulatively.\n- `parallel`: PRs whose scopes don't overlap are tested in parallel.\n- `isolated`: PRs are grouped into batches by changed-files similarity; each batch runs as a fully isolated batch, with no dependency on any other batch.\n",
           "enum": [
             "serial",
             "parallel",
@@ -1522,7 +1892,7 @@
         },
         "queue_controls_comment": {
           "default": true,
-          "description": "When enabled, Mergify renders task-list checkboxes in the Merge Queue status comment so developers can queue or requeue a pull request by clicking a box instead of typing `@mergifyio queue`. The checkboxes only appear for organizations enabled for the feature.",
+          "description": "When enabled, Mergify renders task-list checkboxes a developer can tick instead of typing `@mergifyio queue`. The two controls live in different comments.\n- `Queue this pull request`: a comment of its own, posted before the pull request is queued.\n- `Requeue this pull request`: part of the Merge Queue status comment, after the pull request has left the queue, unless the queue merged it.\n",
           "title": "Queue Controls Comment",
           "type": "boolean"
         }
@@ -1668,10 +2038,11 @@
           ],
           "default": "medium",
           "description": "The priority of the pull request.",
-          "title": "Priority"
+          "title": "Priority",
+          "x-mergify-has-data-type": true
         },
         "allow_checks_interruption": {
-          "default": true,
+          "default": false,
           "description": "Allow interrupting the ongoing checks when the pull request entering the queue has a higher priority than the queued one(s). If set to false, a pull request with higher priority will be inserted just after the pull requests that have checks running.",
           "title": "Allow Checks Interruption",
           "type": "boolean"
@@ -1697,37 +2068,79 @@
         "draft": {
           "description": "Whether the pull request is in draft state.",
           "title": "Draft",
-          "type": "boolean"
+          "type": "boolean",
+          "x-allowed-operators": [],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            }
+          ]
         },
         "merged": {
           "description": "Whether the pull request is merged.",
           "title": "Merged",
-          "type": "boolean"
+          "type": "boolean",
+          "x-allowed-operators": [],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            }
+          ]
         },
         "mergify-configuration-changed": {
           "description": "Whether the pull request contains changes in the configuration file.",
           "title": "Mergify configuration changed",
-          "type": "boolean"
+          "type": "boolean",
+          "x-allowed-operators": [],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            }
+          ]
         },
         "closed": {
           "description": "Whether the pull request is closed.",
           "title": "Closed",
-          "type": "boolean"
+          "type": "boolean",
+          "x-allowed-operators": [],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            }
+          ]
         },
         "locked": {
           "description": "Whether the pull request is locked.",
           "title": "Locked",
-          "type": "boolean"
+          "type": "boolean",
+          "x-allowed-operators": [],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            }
+          ]
         },
         "linear-history": {
           "description": "Whether the pull request commits history is linear (no merge commit).",
           "title": "Linear history",
-          "type": "boolean"
+          "type": "boolean",
+          "x-allowed-operators": [],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            }
+          ]
         },
         "conflict": {
           "description": "Whether the pull request is conflicting with its base branch.",
           "title": "Conflict",
-          "type": "boolean"
+          "type": "boolean",
+          "x-allowed-operators": [],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            }
+          ]
         },
         "github-review-decision": {
           "anyOf": [
@@ -1744,34 +2157,145 @@
             }
           ],
           "description": "The review decision computed by GitHub from its `pullRequest.reviewDecision` field, driven by either classic branch protection or repository / organization rulesets. Typically reflects whether required approvals and `CODEOWNERS` reviews have been satisfied.",
-          "title": "GitHub review decision"
+          "title": "GitHub review decision",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            "~="
+          ],
+          "x-mergify-attribute-metadata": {
+            "documentation_url": "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches#require-pull-request-reviews-before-merging",
+            "source": "github"
+          },
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
         },
         "github-require-review-from-specific-teams": {
           "description": "Whether every `required_reviewers` entry on the branch's active GitHub rulesets is satisfied (each named team has the requested number of approvals, each named user has approved). When the rule scopes the requirement to a subset of files via `file_patterns`, the check only applies to PRs that touch a matching file. Returns `false` if an entry references a team or user id that cannot be resolved.",
           "title": "GitHub require review from specific teams",
-          "type": "boolean"
+          "type": "boolean",
+          "x-allowed-operators": [],
+          "x-mergify-attribute-metadata": {
+            "documentation_url": "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets#required-reviewers",
+            "source": "github"
+          },
+          "x-modifiers": [
+            {
+              "type": "negate"
+            }
+          ]
         },
         "github-code-owner-review-satisfied": {
           "description": "Whether every file the pull request touches that is owned in the repository's `CODEOWNERS` file has at least one approval from one of its owners (a user, or any member of an owning team). Mirrors GitHub's 'Require review from Code Owners', covering the case where GitHub blocks the merge on a code-owner review while `pullRequest.reviewDecision` is `null`. Returns `true` when there is no `CODEOWNERS` file or no touched file is owned, and `false` when an owner cannot be resolved to a GitHub login (an email address, or a team in another org).",
           "title": "GitHub code owner review satisfied",
-          "type": "boolean"
+          "type": "boolean",
+          "x-allowed-operators": [],
+          "x-mergify-attribute-metadata": {
+            "documentation_url": "https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners",
+            "source": "github"
+          },
+          "x-modifiers": [
+            {
+              "type": "negate"
+            }
+          ]
+        },
+        "github-review-approved": {
+          "description": "Whether GitHub's effective review enforcement is satisfied: the required approvals are in and no eligible reviewer is blocking with an active 'Request changes'. When the rule requires at least one approval, this mirrors GitHub's `pullRequest.reviewDecision` (so a blocking review from a reviewer other than the approver is honored, unlike a bare approval count). When the rule requires a pull request with no approval count, it blocks only on a write+ reviewer's active 'Request changes'. Returns `true` when no rule on the base branch requires a review.",
+          "title": "GitHub review approved",
+          "type": "boolean",
+          "x-allowed-operators": [],
+          "x-mergify-attribute-metadata": {
+            "documentation_url": "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches#require-pull-request-reviews-before-merging",
+            "source": "github"
+          },
+          "x-modifiers": [
+            {
+              "type": "negate"
+            }
+          ]
+        },
+        "github-require-last-push-approval": {
+          "description": "Whether GitHub's 'Require approval of the most recent reviewable push' is satisfied: the required number of approvals are in from reviewers other than the user who pushed the most recent commit, and approvals submitted against an earlier head no longer count. Mirrors how GitHub's `pullRequest.reviewDecision` evaluates the `require_last_push_approval` branch protection / ruleset option. Returns `true` when no rule on the base branch requires last-push approval, and (leniently) when Mergify has not recorded the most recent push, such as pull requests opened before push tracking.",
+          "title": "GitHub require last push approval",
+          "type": "boolean",
+          "x-allowed-operators": [],
+          "x-mergify-attribute-metadata": {
+            "documentation_url": "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches#require-pull-request-reviews-before-merging",
+            "source": "github"
+          },
+          "x-modifiers": [
+            {
+              "type": "negate"
+            }
+          ]
         },
         "number": {
           "description": "The pull request number.",
           "maximum": 9223372036854775807,
           "minimum": 0,
           "title": "Number",
-          "type": "integer"
+          "type": "integer",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            ">=",
+            "<=",
+            "<",
+            ">"
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            }
+          ]
         },
         "queue-position": {
           "description": "The position of the pull request in its queue if queued. The first pull request in the queue has position 0. The value is set to -1 if the pull request is not queued.",
           "title": "Queue position",
-          "type": "integer"
+          "type": "integer",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            ">=",
+            "<=",
+            "<",
+            ">"
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            }
+          ]
         },
         "author": {
           "description": "The GitHub user or team login of the author of the pull request.",
           "title": "Author",
-          "type": "string"
+          "type": "string",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            "~=",
+            ">=",
+            "<=",
+            "<",
+            ">",
+            "*="
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
         },
         "merged-by": {
           "anyOf": [
@@ -1783,7 +2307,25 @@
             }
           ],
           "description": "The GitHub user that merged the pull request.",
-          "title": "Merged by"
+          "title": "Merged by",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            "~=",
+            ">=",
+            "<=",
+            "<",
+            ">",
+            "*="
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
         },
         "merge-commit-sha": {
           "anyOf": [
@@ -1795,7 +2337,25 @@
             }
           ],
           "description": "The merge commit SHA of the pull request returned by GitHub.",
-          "title": "Merge commit sha"
+          "title": "Merge commit sha",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            "~=",
+            ">=",
+            "<=",
+            "<",
+            ">",
+            "*="
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
         },
         "milestone": {
           "anyOf": [
@@ -1807,63 +2367,227 @@
             }
           ],
           "description": "The milestone title associated to the pull request.",
-          "title": "Milestone"
+          "title": "Milestone",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            "~=",
+            ">=",
+            "<=",
+            "<",
+            ">"
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
         },
         "base": {
           "description": "The name of the branch the pull request should be pulled into.",
           "title": "Base",
-          "type": "string"
+          "type": "string",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            "~=",
+            ">=",
+            "<=",
+            "<",
+            ">",
+            "*="
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
         },
         "head": {
           "description": "The name of the branch where the pull request changes are implemented.",
           "title": "Head",
-          "type": "string"
+          "type": "string",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            "~=",
+            ">=",
+            "<=",
+            "<",
+            ">",
+            "*="
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
         },
         "head-repo-full-name": {
           "description": "The head branch repository full name (complete version with the organization name).",
           "title": "Head repo full name",
-          "type": "string"
+          "type": "string",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            "~=",
+            ">=",
+            "<=",
+            "<",
+            ">",
+            "*="
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
+        },
+        "from-fork": {
+          "description": "Whether the pull request comes from a fork, i.e. its head branch and its base branch live in different repositories. Also `true` when the head repository has been deleted, since a deleted repository is never the one holding the base branch.",
+          "title": "From fork",
+          "type": "boolean",
+          "x-allowed-operators": [],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            }
+          ]
         },
         "title": {
           "description": "The title of the pull request.",
           "title": "Title",
-          "type": "string"
+          "type": "string",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            "~=",
+            ">=",
+            "<=",
+            "<",
+            ">",
+            "*="
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
         },
         "body": {
           "description": "The content of the pull request description without Markdown/HTML comments.",
           "title": "Body",
-          "type": "string"
+          "type": "string",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            "~=",
+            ">=",
+            "<=",
+            "<",
+            ">",
+            "*="
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
         },
         "body-raw": {
           "description": "The content of the pull request description.",
           "title": "Body raw",
-          "type": "string"
+          "type": "string",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            "~=",
+            ">=",
+            "<=",
+            "<",
+            ">",
+            "*="
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
         },
         "repository-name": {
           "description": "The current repository name (short version without the organization name).",
           "title": "Repository name",
-          "type": "string"
+          "type": "string",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            "~=",
+            ">=",
+            "<=",
+            "<",
+            ">",
+            "*="
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
         },
         "repository-full-name": {
           "description": "The current repository full name (complete version with the organization name).",
           "title": "Repository full name",
-          "type": "string"
+          "type": "string",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            "~=",
+            ">=",
+            "<=",
+            "<",
+            ">",
+            "*="
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
         },
         "queue-dequeue-reason": {
           "anyOf": [
             {
-              "const": "NONE",
-              "type": "string"
-            },
-            {
               "enum": [
+                "NONE",
                 "PR_MERGED",
-                "PR_MERGED_INTERMEDIATE_RESULTS_SKIPPED"
-              ],
-              "type": "string"
-            },
-            {
-              "enum": [
+                "PR_MERGED_INTERMEDIATE_RESULTS_SKIPPED",
                 "PR_DEQUEUED",
                 "PR_DEQUEUED_FROM_PARTITION",
                 "PR_AHEAD_DEQUEUED",
@@ -1873,6 +2597,7 @@
                 "SPECULATIVE_CHECK_NUMBER_REDUCED",
                 "CHECKS_TIMEOUT",
                 "CHECKS_FAILED",
+                "DROPPED_BY_BISECTION_ELIMINATION",
                 "QUEUE_RULE_MISSING",
                 "BASE_BRANCH_MISSING",
                 "BASE_BRANCH_CHANGED",
@@ -1896,7 +2621,12 @@
                 "STACK_PREDECESSOR_DEQUEUED",
                 "INTERMEDIATE_RESULTS_SKIPPED",
                 "CHECKS_RETRIED",
-                "SCHEDULE_BLOCKED_AHEAD_YIELDED"
+                "SCHEDULE_BLOCKED_AHEAD_YIELDED",
+                "BASE_REF_ALIGNMENT_TIMEOUT",
+                "GITHUB_STACKED_PULL_REQUEST_MERGE_UNSUPPORTED",
+                "BATCH_SCOPES_CHANGED",
+                "BATCH_AHEAD_BRANCH_EDITED",
+                "CHECKS_INTERRUPTED"
               ],
               "type": "string"
             },
@@ -1904,8 +2634,150 @@
               "type": "null"
             }
           ],
-          "description": "A dequeue code for when a pull request has been disembarked from the merge queue.",
-          "title": "Queue dequeue reason"
+          "description": "The code identifying why a pull request's merge queue checks ended \u2014 the pull request may have left the queue, or had its checks interrupted while staying in the queue.",
+          "title": "Queue dequeue reason",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            "~="
+          ],
+          "x-mergify-enum": [
+            {
+              "description": "The pull request is not, and never was, in a merge queue."
+            },
+            {
+              "description": "The pull request was merged by the merge queue."
+            },
+            {
+              "description": "The pull request was merged based on the successful result of a later pull request in the same speculative batch, skipping its own intermediate checks."
+            },
+            {
+              "description": "The pull request was removed from the queue, for example because its queue conditions no longer match."
+            },
+            {
+              "description": "The pull request stopped matching a partition's rules and was removed from that partition."
+            },
+            {
+              "description": "A pull request ahead in the queue was removed, so this pull request's speculative checks are restarted. It stays in the queue."
+            },
+            {
+              "description": "A batch ahead in the queue failed, so this pull request's speculative checks are restarted. It stays in the queue."
+            },
+            {
+              "description": "A higher-priority pull request was queued ahead of this one. It stays in the queue."
+            },
+            {
+              "description": "A scheduled queue freeze changed the freeze status of the batch's pull requests, so the batch was split. It stays in the queue."
+            },
+            {
+              "description": "The number of speculative checks was reduced. The pull request stays in the queue."
+            },
+            {
+              "description": "The `checks_timeout` was reached before the queue conditions were satisfied. Unless the queue configures it, that timeout is derived from the queue's recent CI runtime."
+            },
+            {
+              "description": "The queue conditions cannot be satisfied because required checks failed."
+            },
+            {
+              "description": "Batch bisection isolated the failure to other pull requests and dropped this one without testing it individually."
+            },
+            {
+              "description": "The queue rule referenced by the pull request no longer exists in the configuration."
+            },
+            {
+              "description": "The pull request's base branch no longer exists."
+            },
+            {
+              "description": "The pull request's base branch changed."
+            },
+            {
+              "description": "An unexpected error happened while merging the pull request."
+            },
+            {
+              "description": "The maximum number of `batch_max_failure_resolution_attempts` was reached while isolating a batch failure."
+            },
+            {
+              "description": "The pull request's checks were interrupted because the merge queue is paused on the repository. It stays in the queue."
+            },
+            {
+              "description": "The pull request conflicts with its base branch."
+            },
+            {
+              "description": "The pull request conflicts with a pull request ahead of it in the queue."
+            },
+            {
+              "description": "Updating the pull request's head branch failed."
+            },
+            {
+              "description": "The merge queue draft pull request received commits that Mergify did not create."
+            },
+            {
+              "description": "The merge queue batch pull request was closed."
+            },
+            {
+              "description": "The pull request was manually updated."
+            },
+            {
+              "description": "The merge queue was reset."
+            },
+            {
+              "description": "The pull request cannot be checked because of an incompatibility between the queue and the repository's branch protections."
+            },
+            {
+              "description": "The pull request was merged manually, outside of the merge queue."
+            },
+            {
+              "description": "Mergify could not create the merge queue draft pull request."
+            },
+            {
+              "description": "Mergify could not create the merge queue draft pull request because GitHub had not yet indexed the new branch."
+            },
+            {
+              "description": "The Mergify configuration changed while the pull request was queued."
+            },
+            {
+              "description": "Mergify cannot process the pull request, for example because it has too many check runs, comments, or files."
+            },
+            {
+              "description": "The pull request was manually removed from the queue."
+            },
+            {
+              "description": "A predecessor pull request in the same stack was dequeued, so this one was removed as well."
+            },
+            {
+              "description": "The pull request's intermediate speculative results were skipped. It stays in the queue."
+            },
+            {
+              "description": "The pull request's failed checks are being retried. It stays in the queue."
+            },
+            {
+              "description": "A pull request ahead that was waiting for its merge schedule yielded its position so ready pull requests behind it can merge first. It stays in the queue."
+            },
+            {
+              "description": "The pull request could not be retargeted onto the queue base branch, for example a stacked pull request GitHub never retargeted."
+            },
+            {
+              "description": "The pull request is a GitHub stacked pull request, which GitHub does not support merging through its API."
+            },
+            {
+              "description": "A pull request's scopes changed after it was embarked, so its batch was recomposed. It stays in the queue."
+            },
+            {
+              "description": "A commit was pushed to the branch of a batch ahead in the queue, which `allow_queue_branch_edit` permits, so this pull request's speculative checks are restarted on top of it. It stays in the queue."
+            },
+            {
+              "description": "A required check was cancelled before producing a result, so the queue conditions cannot be satisfied. The check says nothing about the pull request; requeueing runs it again."
+            }
+          ],
+          "x-mergify-has-data-type": true,
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
         },
         "queue-name": {
           "anyOf": [
@@ -1917,7 +2789,25 @@
             }
           ],
           "description": "The name of the queue containing the pull request.",
-          "title": "Queue name"
+          "title": "Queue name",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            "~=",
+            ">=",
+            "<=",
+            "<",
+            ">",
+            "*="
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
         },
         "assignee": {
           "description": "The list of GitHub user or team login that are assigned to the pull request. Team logins are prefixed with the `@` character and must belong to the repository organization.",
@@ -1925,7 +2815,25 @@
             "type": "string"
           },
           "title": "Assignee",
-          "type": "array"
+          "type": "array",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            "~=",
+            ">=",
+            "<=",
+            "<",
+            ">",
+            "*="
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
         },
         "label": {
           "description": "The list of labels of the pull request.",
@@ -1933,7 +2841,25 @@
             "type": "string"
           },
           "title": "Label",
-          "type": "array"
+          "type": "array",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            "~=",
+            ">=",
+            "<=",
+            "<",
+            ">",
+            "*="
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
         },
         "review-requested": {
           "description": "The list of GitHub user or team login that were requested to review the pull request. Team logins are prefixed with the @ character. This only matches reviewers with `admin`, `write` or `maintain` permission on the repository.",
@@ -1941,7 +2867,25 @@
             "type": "string"
           },
           "title": "Review requested",
-          "type": "array"
+          "type": "array",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            "~=",
+            ">=",
+            "<=",
+            "<",
+            ">",
+            "*="
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
         },
         "approved-reviews-by": {
           "description": "The list of GitHub user or team login that approved the pull request. Team logins are prefixed with the `@` character and must belong to the repository organization. This only matches reviewers with `admin`, `write` or `maintain` permission on the repository.",
@@ -1949,7 +2893,25 @@
             "type": "string"
           },
           "title": "Approved reviews by",
-          "type": "array"
+          "type": "array",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            "~=",
+            ">=",
+            "<=",
+            "<",
+            ">",
+            "*="
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
         },
         "dismissed-reviews-by": {
           "description": "The list of GitHub user login that have their review dismissed in the pull request.",
@@ -1957,7 +2919,25 @@
             "type": "string"
           },
           "title": "Dismissed reviews by",
-          "type": "array"
+          "type": "array",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            "~=",
+            ">=",
+            "<=",
+            "<",
+            ">",
+            "*="
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
         },
         "changes-requested-reviews-by": {
           "description": "The list of GitHub user or team login that have requested changes in a review for the pull request.",
@@ -1965,7 +2945,25 @@
             "type": "string"
           },
           "title": "Changes requested reviews by",
-          "type": "array"
+          "type": "array",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            "~=",
+            ">=",
+            "<=",
+            "<",
+            ">",
+            "*="
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
         },
         "commented-reviews-by": {
           "description": "The list of GitHub user that have commented in a review for the pull request. This only matches reviewers with `admin`, `write` or `maintain` permission on the repository.",
@@ -1973,7 +2971,25 @@
             "type": "string"
           },
           "title": "Commented reviews by",
-          "type": "array"
+          "type": "array",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            "~=",
+            ">=",
+            "<=",
+            "<",
+            ">",
+            "*="
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
         },
         "check-success": {
           "description": "The list of checks that successfully passed for the pull request.",
@@ -1981,7 +2997,25 @@
             "type": "string"
           },
           "title": "Check success",
-          "type": "array"
+          "type": "array",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            "~=",
+            ">=",
+            "<=",
+            "<",
+            ">",
+            "*="
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
         },
         "check-failure": {
           "description": "The list of checks that failed for the pull request. Checks that report being cancelled, timed out, and action required are also considered as failures.",
@@ -1989,7 +3023,25 @@
             "type": "string"
           },
           "title": "Check failure",
-          "type": "array"
+          "type": "array",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            "~=",
+            ">=",
+            "<=",
+            "<",
+            ">",
+            "*="
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
         },
         "check-neutral": {
           "description": "The list of checks that are neutral for the pull request. ",
@@ -1997,7 +3049,25 @@
             "type": "string"
           },
           "title": "Check neutral",
-          "type": "array"
+          "type": "array",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            "~=",
+            ">=",
+            "<=",
+            "<",
+            ">",
+            "*="
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
         },
         "check-timed-out": {
           "description": "The list of checks that timed out for the pull request.",
@@ -2005,7 +3075,25 @@
             "type": "string"
           },
           "title": "Check timed out",
-          "type": "array"
+          "type": "array",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            "~=",
+            ">=",
+            "<=",
+            "<",
+            ">",
+            "*="
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
         },
         "check-skipped": {
           "description": "The list of checks that was skipped for the pull request.",
@@ -2013,7 +3101,25 @@
             "type": "string"
           },
           "title": "Check skipped",
-          "type": "array"
+          "type": "array",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            "~=",
+            ">=",
+            "<=",
+            "<",
+            ">",
+            "*="
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
         },
         "check-cancelled": {
           "description": "The list of checks that were cancelled for the pull request. Cancelled checks are also matched by `check-failure`; use `check-cancelled` to address them independently.",
@@ -2021,7 +3127,25 @@
             "type": "string"
           },
           "title": "Check cancelled",
-          "type": "array"
+          "type": "array",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            "~=",
+            ">=",
+            "<=",
+            "<",
+            ">",
+            "*="
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
         },
         "check-pending": {
           "description": "The list of checks that are pending for the pull request.",
@@ -2029,7 +3153,25 @@
             "type": "string"
           },
           "title": "Check pending",
-          "type": "array"
+          "type": "array",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            "~=",
+            ">=",
+            "<=",
+            "<",
+            ">",
+            "*="
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
         },
         "check": {
           "description": "The list of checks for that pull request.",
@@ -2045,7 +3187,25 @@
             "type": "string"
           },
           "title": "Check stale",
-          "type": "array"
+          "type": "array",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            "~=",
+            ">=",
+            "<=",
+            "<",
+            ">",
+            "*="
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
         },
         "commits-unverified": {
           "description": "The list of commit messages that are marked as unverified by GitHub.",
@@ -2053,23 +3213,77 @@
             "type": "string"
           },
           "title": "Commits unverified",
-          "type": "array"
+          "type": "array",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            "~=",
+            ">=",
+            "<=",
+            "<",
+            ">",
+            "*="
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
         },
         "deployment-success": {
-          "description": "The list of deployments that successfully passed for the pull request.",
+          "description": "The list of environments successfully deployed for the pull request. A deployment published by a GitHub App is also matched by its qualified `@<github-app-slug>/<environment>` form.",
           "items": {
             "type": "string"
           },
           "title": "Deployment success",
-          "type": "array"
+          "type": "array",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            "~=",
+            ">=",
+            "<=",
+            "<",
+            ">",
+            "*="
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
         },
         "deployment-failure": {
-          "description": "The list of deployments that failed for the pull request.",
+          "description": "The list of environments whose deployment failed for the pull request. A deployment published by a GitHub App is also matched by its qualified `@<github-app-slug>/<environment>` form.",
           "items": {
             "type": "string"
           },
           "title": "Deployment failure",
-          "type": "array"
+          "type": "array",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            "~=",
+            ">=",
+            "<=",
+            "<",
+            ">",
+            "*="
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
         },
         "review-threads-resolved": {
           "description": "The list of ids associated to review threads that are marked as resolved by GitHub.",
@@ -2077,7 +3291,25 @@
             "type": "string"
           },
           "title": "Review threads resolved",
-          "type": "array"
+          "type": "array",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            "~=",
+            ">=",
+            "<=",
+            "<",
+            ">",
+            "*="
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
         },
         "review-threads-unresolved": {
           "description": "The list of ids associated to review threads that are NOT marked as resolved by GitHub.",
@@ -2085,39 +3317,129 @@
             "type": "string"
           },
           "title": "Review threads unresolved",
-          "type": "array"
+          "type": "array",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            "~=",
+            ">=",
+            "<=",
+            "<",
+            ">",
+            "*="
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
         },
         "files": {
-          "description": "The files that are modified, deleted or added by the pull request.",
+          "description": "The files that are modified, deleted or added by the pull request. A renamed file counts at both of its paths, so it appears twice; `#files` reports GitHub's own changed-file count, which counts it once.",
           "items": {
             "type": "string"
           },
           "title": "Files",
-          "type": "array"
+          "type": "array",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            "~=",
+            ">=",
+            "<=",
+            "<",
+            ">",
+            "*="
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
         },
         "added-files": {
-          "description": "The files that are added by the pull request.",
+          "description": "The files that are added by the pull request, including the destination of a renamed file.",
           "items": {
             "type": "string"
           },
           "title": "Added files",
-          "type": "array"
+          "type": "array",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            "~=",
+            ">=",
+            "<=",
+            "<",
+            ">",
+            "*="
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
         },
         "modified-files": {
-          "description": "The files that are modified by the pull request.",
+          "description": "The files that are modified in place by the pull request. A renamed file is not modified: it is removed at its previous path and added at its new one.",
           "items": {
             "type": "string"
           },
           "title": "Modified files",
-          "type": "array"
+          "type": "array",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            "~=",
+            ">=",
+            "<=",
+            "<",
+            ">",
+            "*="
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
         },
         "removed-files": {
-          "description": "The files that are removed by the pull request.",
+          "description": "The files that are removed by the pull request, including the previous path of a renamed file.",
           "items": {
             "type": "string"
           },
           "title": "Removed files",
-          "type": "array"
+          "type": "array",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            "~=",
+            ">=",
+            "<=",
+            "<",
+            ">",
+            "*="
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
         },
         "added-lines": {
           "description": "The lines that are added by the pull request. Only usable as `#added-lines` for the number of added lines.",
@@ -2125,7 +3447,25 @@
             "type": "string"
           },
           "title": "Added lines",
-          "type": "array"
+          "type": "array",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            "~=",
+            ">=",
+            "<=",
+            "<",
+            ">",
+            "*="
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
         },
         "modified-lines": {
           "description": "The lines that are modified by the pull request. Only usable as `#modified-lines` for the number of modified lines.",
@@ -2133,7 +3473,25 @@
             "type": "string"
           },
           "title": "Modified lines",
-          "type": "array"
+          "type": "array",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            "~=",
+            ">=",
+            "<=",
+            "<",
+            ">",
+            "*="
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
         },
         "deleted-lines": {
           "description": "The lines that are deleted by the pull request. Only usable as `#deleted-lines` for the number of deleted lines.",
@@ -2141,7 +3499,25 @@
             "type": "string"
           },
           "title": "Deleted lines",
-          "type": "array"
+          "type": "array",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            "~=",
+            ">=",
+            "<=",
+            "<",
+            ">",
+            "*="
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
         },
         "co-authors": {
           "description": "The list of co-authors on the pull request (excluding merge commits and bots).",
@@ -2157,7 +3533,24 @@
             "type": "string"
           },
           "title": "Commits behind",
-          "type": "array"
+          "type": "array",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            ">=",
+            "<=",
+            "<",
+            ">"
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "required": true,
+              "type": "length"
+            }
+          ]
         },
         "depends-on": {
           "description": "The list of dependencies to other pull request in the format `owner/repo#prnumber`.",
@@ -2165,7 +3558,25 @@
             "type": "string"
           },
           "title": "Depends on",
-          "type": "array"
+          "type": "array",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            "~=",
+            ">=",
+            "<=",
+            "<",
+            ">",
+            "*="
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
         },
         "dependabot-dependency-name": {
           "description": "The dependency-name value included in the Dependabot commit message.",
@@ -2173,7 +3584,25 @@
             "type": "string"
           },
           "title": "Dependabot dependency name",
-          "type": "array"
+          "type": "array",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            "~=",
+            ">=",
+            "<=",
+            "<",
+            ">",
+            "*="
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
         },
         "dependabot-dependency-type": {
           "description": "The dependency-type value included in the Dependabot commit message.",
@@ -2181,7 +3610,25 @@
             "type": "string"
           },
           "title": "Dependabot dependency type",
-          "type": "array"
+          "type": "array",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            "~=",
+            ">=",
+            "<=",
+            "<",
+            ">",
+            "*="
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
         },
         "dependabot-update-type": {
           "description": "The update-type value included in the Dependabot commit message.",
@@ -2189,15 +3636,51 @@
             "type": "string"
           },
           "title": "Dependabot update type",
-          "type": "array"
+          "type": "array",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            "~=",
+            ">=",
+            "<=",
+            "<",
+            ">",
+            "*="
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
         },
         "scope": {
-          "description": "The list of scopes associated with the pull request for merge queue batching.",
+          "description": "The list of scopes associated with the pull request for merge queue batching. With a `files` source, a renamed file counts at both of its paths, so moving a file out of a scope reports that scope as well as the destination's.",
           "items": {
             "type": "string"
           },
           "title": "Scope",
-          "type": "array"
+          "type": "array",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            "~=",
+            ">=",
+            "<=",
+            "<",
+            ">",
+            "*="
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
         },
         "commits": {
           "description": "The list of commits of the pull request. The index 0 is the first commit, while -1 is the last commit.",
@@ -2205,25 +3688,66 @@
             "$ref": "#/$defs/Commit"
           },
           "title": "Commits",
-          "type": "array"
+          "type": "array",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            "~=",
+            ">=",
+            "<=",
+            "<",
+            ">",
+            "*="
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
         },
         "current-datetime": {
           "description": "The current date and time.",
           "format": "date-time",
           "title": "Current datetime",
-          "type": "string"
+          "type": "string",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            ">=",
+            "<=",
+            "<",
+            ">"
+          ],
+          "x-modifiers": []
         },
         "updated-at": {
           "description": "The time the pull request was updated at.",
           "format": "date-time",
           "title": "Updated at",
-          "type": "string"
+          "type": "string",
+          "x-allowed-operators": [
+            ">=",
+            "<=",
+            "<",
+            ">"
+          ],
+          "x-modifiers": []
         },
         "created-at": {
           "description": "The time the pull request was created at.",
           "format": "date-time",
           "title": "Created at",
-          "type": "string"
+          "type": "string",
+          "x-allowed-operators": [
+            ">=",
+            "<=",
+            "<",
+            ">"
+          ],
+          "x-modifiers": []
         },
         "closed-at": {
           "anyOf": [
@@ -2236,7 +3760,14 @@
             }
           ],
           "description": "The time the pull request was closed at.",
-          "title": "Closed at"
+          "title": "Closed at",
+          "x-allowed-operators": [
+            ">=",
+            "<=",
+            "<",
+            ">"
+          ],
+          "x-modifiers": []
         },
         "merged-at": {
           "anyOf": [
@@ -2249,7 +3780,14 @@
             }
           ],
           "description": "The time the pull request was merged at.",
-          "title": "Merged at"
+          "title": "Merged at",
+          "x-allowed-operators": [
+            ">=",
+            "<=",
+            "<",
+            ">"
+          ],
+          "x-modifiers": []
         },
         "queued-at": {
           "anyOf": [
@@ -2262,7 +3800,14 @@
             }
           ],
           "description": "The time the pull request was queued at for merge.",
-          "title": "Queued at"
+          "title": "Queued at",
+          "x-allowed-operators": [
+            ">=",
+            "<=",
+            "<",
+            ">"
+          ],
+          "x-modifiers": []
         },
         "queue-merge-started-at": {
           "anyOf": [
@@ -2275,22 +3820,69 @@
             }
           ],
           "description": "The time the pull request mergeability checks have started at.",
-          "title": "Queue merge started at"
+          "title": "Queue merge started at",
+          "x-allowed-operators": [
+            ">=",
+            "<=",
+            "<",
+            ">"
+          ],
+          "x-modifiers": []
         },
         "schedule": {
           "description": "The current time will be compared against this schedule to validate this attribute.",
           "title": "Schedule",
-          "type": "string"
+          "type": "string",
+          "x-allowed-operators": [
+            "=",
+            "!="
+          ],
+          "x-mergify-has-data-type": true,
+          "x-modifiers": []
         },
         "sender-permission": {
           "$ref": "#/$defs/GitHubRepositoryPermission",
           "description": "The permission of the command author.",
-          "title": "Sender permission"
+          "title": "Sender permission",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            ">=",
+            "<=",
+            "<",
+            ">"
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
         },
         "sender": {
           "description": "The GitHub login of the command author.",
           "title": "Sender",
-          "type": "string"
+          "type": "string",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            "~=",
+            ">=",
+            "<=",
+            "<",
+            ">",
+            "*="
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
         },
         "updates": {
           "description": "The list of updates done on an opened pull request.",
@@ -2298,7 +3890,25 @@
             "$ref": "#/$defs/PullRequestHeadShaHistoryDict"
           },
           "title": "Updates",
-          "type": "array"
+          "type": "array",
+          "x-allowed-operators": [
+            "=",
+            "!=",
+            "~=",
+            ">=",
+            "<=",
+            "<",
+            ">",
+            "*="
+          ],
+          "x-modifiers": [
+            {
+              "type": "negate"
+            },
+            {
+              "type": "length"
+            }
+          ]
         }
       },
       "required": [
@@ -2312,6 +3922,8 @@
         "github-review-decision",
         "github-require-review-from-specific-teams",
         "github-code-owner-review-satisfied",
+        "github-review-approved",
+        "github-require-last-push-approval",
         "number",
         "queue-position",
         "author",
@@ -2321,6 +3933,7 @@
         "base",
         "head",
         "head-repo-full-name",
+        "from-fork",
         "title",
         "body",
         "body-raw",
@@ -2544,7 +4157,7 @@
         },
         "branch_protection_injection_mode": {
           "default": "queue",
-          "description": "Branch protections conditions injection mode to use.\n\n- `queue` will inject branch protections conditions as required conditions for queuing and merging pull requests.\n- `merge` will inject branch protections conditions as required conditions only for merging pull requests.\n\nTo skip injection for a specific ruleset, see [bypass actors and injection](https://docs.mergify.com/merge-queue/github-rulesets/#bypass-actors-and-injection).",
+          "description": "Branch protections conditions injection mode to use.\n\n- `queue` will inject branch protections conditions as required conditions for queuing and merging pull requests.\n- `merge` will inject branch protections conditions as required conditions only for merging pull requests.\n- `none` will not inject them at all, and requires a `merge_bot_account` able to satisfy the protections itself.",
           "enum": [
             "queue",
             "merge",
@@ -2554,12 +4167,9 @@
           "type": "string"
         },
         "batch_size": {
+          "$ref": "#/$defs/BatchSizeBounds",
           "default": 1,
-          "description": "The maximum number of pull requests per speculative check in the queue. Must be between 1 and 128.",
-          "maximum": 128,
-          "minimum": 1,
-          "title": "Batch Size",
-          "type": "integer"
+          "description": "The number of pull requests per speculative check in the queue. Either a single integer (fixed size, 1-128) or an object `{min, max}` for dynamic batching: the queue uses `min` when parallel-check slots are plentiful and grows toward `max` to keep the backlog at zero."
         },
         "batch_max_wait_time": {
           "default": "30 seconds",
@@ -2589,8 +4199,8 @@
               "type": "null"
             }
           ],
-          "default": null,
-          "description": "The amount of time the merge queue waits for pending checks to return before dequeueing pull requests. This cannot be less than 60 seconds. Set to `auto` to let Mergify compute the timeout from the recent CI runtime of this queue (the 95th-percentile runtime with a safety margin); `auto` applies no timeout until enough history has been gathered.",
+          "default": "auto",
+          "description": "The amount of time the merge queue waits for pending checks to return before dequeueing pull requests. This cannot be less than 60 seconds. Defaults to `auto`, which lets Mergify compute the timeout from the recent CI runtime of this queue (the 95th-percentile runtime with a safety margin). Runs identified as retry reruns or bisection runs are excluded from the calibration; runs whose provenance predates this tracking are kept for compatibility. `auto` applies no timeout until enough history has been gathered. Set to `null` to disable the checks timeout entirely.",
           "title": "Checks Timeout"
         },
         "max_checks_retries": {
@@ -2603,11 +4213,16 @@
         "draft_bot_account": {
           "anyOf": [
             {
-              "const": "{{ author }}",
-              "title": "Pull request author"
-            },
-            {
-              "type": "string"
+              "description": "A string with `{{ variable }}` placeholders. Allowed variables: `author`.",
+              "format": "simple-template",
+              "title": "Bot account",
+              "type": "string",
+              "x-mergify-template-variables": [
+                {
+                  "description": "The pull request author's login.",
+                  "name": "author"
+                }
+              ]
             },
             {
               "type": "null"
@@ -2629,18 +4244,18 @@
           ],
           "default": null,
           "deprecated": true,
-          "description": "If set to `fast-forward`, Mergify will merge the draft pull request instead of merging the original pull request that has been checked. This only works when `merge_method` is set to `merge`.",
+          "description": "Deprecated spelling of `merge_method: fast-forward`. If set to `fast-forward`, Mergify moves the base branch onto the draft pull request instead of merging the original pull request that has been checked, whatever `merge_method` is set to. Use `merge_method: fast-forward` instead.",
           "title": "Queue Branch Merge Method"
         },
         "queue_branch_prefix": {
           "default": "mergify/merge-queue/",
-          "description": "Prefix for the merge queue branch name",
+          "description": "Prefix for the merge queue branch name. Branches under this prefix are eligible for automatic [queue branch cleanup](https://docs.mergify.com/merge-queue/lifecycle#queue-branch-cleanup).",
           "title": "Queue Branch Prefix",
           "type": "string"
         },
         "allow_queue_branch_edit": {
           "default": false,
-          "description": "When creating a branch for a queue, if the commits of this branch are edited by an entity external to Mergify, Mergify dequeues all pull requests embarked in the branch and report the issue as a failure. If set to `true`, Mergify will allow such modifications and trust the content of the branch. Make sure only Mergify and your external application are allowed to edit these branches.",
+          "description": "When creating a branch for a queue, if the commits of this branch are edited by an entity external to Mergify, Mergify dequeues all pull requests embarked in the branch and report the issue as a failure. If set to `true`, Mergify will allow such modifications and trust the content of the branch. Make sure only Mergify and your external application are allowed to edit these branches.\n\nThis option requires `merge_method` to be `merge-batch` or `fast-forward`. Those two merge the batch branch itself, so a commit pushed to it is part of what lands on the base branch; `merge`, `squash` and `rebase` merge each pull request at its own head, which never includes the edit.\n\nEnabling it therefore means the merged content is the batch branch, including commits that were never reviewed as part of any pull request. That is the contract of this option: it exists for batch-level work (a conflict resolution, a migration reorder, a lockfile regeneration) that belongs to no single pull request.\n\nNote also that under these two merge methods Mergify does not merge the pull requests one by one: GitHub marks each embarked pull request as merged only when its head commit is reachable from the new base branch tip, so a pull request whose head no longer matches what was embarked is not shown as merged even though its content landed.",
           "title": "Allow Queue Branch Edit",
           "type": "boolean"
         },
@@ -2720,8 +4335,13 @@
               "type": "null"
             }
           ],
+          "configuration_deprecated_attribute": {
+            "deprecated_summary_ghes_mode": "`commit_message_template` is deprecated and will be removed on 2026-09-30. Use the declarative `commit_message_format` instead: https://docs.mergify.com/workflow/actions/merge#migrating-from-commit_message_template",
+            "deprecated_summary_saas_mode": "`commit_message_template` is deprecated and will be removed on 2026-09-30. Use the declarative `commit_message_format` instead: https://docs.mergify.com/workflow/actions/merge#migrating-from-commit_message_template"
+          },
           "default": null,
-          "description": "Template to use as the commit message when using the merge or squash merge method.",
+          "deprecated": true,
+          "description": "Template to use as the commit message when using the merge or squash merge method. Deprecated: use `commit_message_format` instead.",
           "title": "Commit Message Template"
         },
         "commit_message_format": {
@@ -2739,11 +4359,16 @@
         "merge_bot_account": {
           "anyOf": [
             {
-              "const": "{{ author }}",
-              "title": "Pull request author"
-            },
-            {
-              "type": "string"
+              "description": "A string with `{{ variable }}` placeholders. Allowed variables: `author`.",
+              "format": "simple-template",
+              "title": "Bot account",
+              "type": "string",
+              "x-mergify-template-variables": [
+                {
+                  "description": "The pull request author's login.",
+                  "name": "author"
+                }
+              ]
             },
             {
               "type": "null"
@@ -2756,11 +4381,16 @@
         "update_bot_account": {
           "anyOf": [
             {
-              "const": "{{ author }}",
-              "title": "Pull request author"
-            },
-            {
-              "type": "string"
+              "description": "A string with `{{ variable }}` placeholders. Allowed variables: `author`.",
+              "format": "simple-template",
+              "title": "Bot account",
+              "type": "string",
+              "x-mergify-template-variables": [
+                {
+                  "description": "The pull request author's login.",
+                  "name": "author"
+                }
+              ]
             },
             {
               "type": "null"
@@ -2795,7 +4425,7 @@
         },
         "branch_protection_injection_mode": {
           "default": "queue",
-          "description": "Branch protections conditions injection mode to use.\n\n- `queue` will inject branch protections conditions as required conditions for queuing and merging pull requests.\n- `merge` will inject branch protections conditions as required conditions only for merging pull requests.\n\nTo skip injection for a specific ruleset, see [bypass actors and injection](https://docs.mergify.com/merge-queue/github-rulesets/#bypass-actors-and-injection).",
+          "description": "Branch protections conditions injection mode to use.\n\n- `queue` will inject branch protections conditions as required conditions for queuing and merging pull requests.\n- `merge` will inject branch protections conditions as required conditions only for merging pull requests.\n- `none` will not inject them at all, and requires a `merge_bot_account` able to satisfy the protections itself.",
           "enum": [
             "queue",
             "merge",
@@ -2805,12 +4435,9 @@
           "type": "string"
         },
         "batch_size": {
+          "$ref": "#/$defs/BatchSizeBounds",
           "default": 1,
-          "description": "The maximum number of pull requests per speculative check in the queue. Must be between 1 and 128.",
-          "maximum": 128,
-          "minimum": 1,
-          "title": "Batch Size",
-          "type": "integer"
+          "description": "The number of pull requests per speculative check in the queue. Either a single integer (fixed size, 1-128) or an object `{min, max}` for dynamic batching: the queue uses `min` when parallel-check slots are plentiful and grows toward `max` to keep the backlog at zero."
         },
         "batch_max_wait_time": {
           "default": "30 seconds",
@@ -2840,8 +4467,8 @@
               "type": "null"
             }
           ],
-          "default": null,
-          "description": "The amount of time the merge queue waits for pending checks to return before dequeueing pull requests. This cannot be less than 60 seconds. Set to `auto` to let Mergify compute the timeout from the recent CI runtime of this queue (the 95th-percentile runtime with a safety margin); `auto` applies no timeout until enough history has been gathered.",
+          "default": "auto",
+          "description": "The amount of time the merge queue waits for pending checks to return before dequeueing pull requests. This cannot be less than 60 seconds. Defaults to `auto`, which lets Mergify compute the timeout from the recent CI runtime of this queue (the 95th-percentile runtime with a safety margin). Runs identified as retry reruns or bisection runs are excluded from the calibration; runs whose provenance predates this tracking are kept for compatibility. `auto` applies no timeout until enough history has been gathered. Set to `null` to disable the checks timeout entirely.",
           "title": "Checks Timeout"
         },
         "max_checks_retries": {
@@ -2854,11 +4481,16 @@
         "draft_bot_account": {
           "anyOf": [
             {
-              "const": "{{ author }}",
-              "title": "Pull request author"
-            },
-            {
-              "type": "string"
+              "description": "A string with `{{ variable }}` placeholders. Allowed variables: `author`.",
+              "format": "simple-template",
+              "title": "Bot account",
+              "type": "string",
+              "x-mergify-template-variables": [
+                {
+                  "description": "The pull request author's login.",
+                  "name": "author"
+                }
+              ]
             },
             {
               "type": "null"
@@ -2880,18 +4512,18 @@
           ],
           "default": null,
           "deprecated": true,
-          "description": "If set to `fast-forward`, Mergify will merge the draft pull request instead of merging the original pull request that has been checked. This only works when `merge_method` is set to `merge`.",
+          "description": "Deprecated spelling of `merge_method: fast-forward`. If set to `fast-forward`, Mergify moves the base branch onto the draft pull request instead of merging the original pull request that has been checked, whatever `merge_method` is set to. Use `merge_method: fast-forward` instead.",
           "title": "Queue Branch Merge Method"
         },
         "queue_branch_prefix": {
           "default": "mergify/merge-queue/",
-          "description": "Prefix for the merge queue branch name",
+          "description": "Prefix for the merge queue branch name. Branches under this prefix are eligible for automatic [queue branch cleanup](https://docs.mergify.com/merge-queue/lifecycle#queue-branch-cleanup).",
           "title": "Queue Branch Prefix",
           "type": "string"
         },
         "allow_queue_branch_edit": {
           "default": false,
-          "description": "When creating a branch for a queue, if the commits of this branch are edited by an entity external to Mergify, Mergify dequeues all pull requests embarked in the branch and report the issue as a failure. If set to `true`, Mergify will allow such modifications and trust the content of the branch. Make sure only Mergify and your external application are allowed to edit these branches.",
+          "description": "When creating a branch for a queue, if the commits of this branch are edited by an entity external to Mergify, Mergify dequeues all pull requests embarked in the branch and report the issue as a failure. If set to `true`, Mergify will allow such modifications and trust the content of the branch. Make sure only Mergify and your external application are allowed to edit these branches.\n\nThis option requires `merge_method` to be `merge-batch` or `fast-forward`. Those two merge the batch branch itself, so a commit pushed to it is part of what lands on the base branch; `merge`, `squash` and `rebase` merge each pull request at its own head, which never includes the edit.\n\nEnabling it therefore means the merged content is the batch branch, including commits that were never reviewed as part of any pull request. That is the contract of this option: it exists for batch-level work (a conflict resolution, a migration reorder, a lockfile regeneration) that belongs to no single pull request.\n\nNote also that under these two merge methods Mergify does not merge the pull requests one by one: GitHub marks each embarked pull request as merged only when its head commit is reachable from the new base branch tip, so a pull request whose head no longer matches what was embarked is not shown as merged even though its content landed.",
           "title": "Allow Queue Branch Edit",
           "type": "boolean"
         },
@@ -2971,8 +4603,13 @@
               "type": "null"
             }
           ],
+          "configuration_deprecated_attribute": {
+            "deprecated_summary_ghes_mode": "`commit_message_template` is deprecated and will be removed on 2026-09-30. Use the declarative `commit_message_format` instead: https://docs.mergify.com/workflow/actions/merge#migrating-from-commit_message_template",
+            "deprecated_summary_saas_mode": "`commit_message_template` is deprecated and will be removed on 2026-09-30. Use the declarative `commit_message_format` instead: https://docs.mergify.com/workflow/actions/merge#migrating-from-commit_message_template"
+          },
           "default": null,
-          "description": "Template to use as the commit message when using the merge or squash merge method.",
+          "deprecated": true,
+          "description": "Template to use as the commit message when using the merge or squash merge method. Deprecated: use `commit_message_format` instead.",
           "title": "Commit Message Template"
         },
         "commit_message_format": {
@@ -2990,11 +4627,16 @@
         "merge_bot_account": {
           "anyOf": [
             {
-              "const": "{{ author }}",
-              "title": "Pull request author"
-            },
-            {
-              "type": "string"
+              "description": "A string with `{{ variable }}` placeholders. Allowed variables: `author`.",
+              "format": "simple-template",
+              "title": "Bot account",
+              "type": "string",
+              "x-mergify-template-variables": [
+                {
+                  "description": "The pull request author's login.",
+                  "name": "author"
+                }
+              ]
             },
             {
               "type": "null"
@@ -3007,11 +4649,16 @@
         "update_bot_account": {
           "anyOf": [
             {
-              "const": "{{ author }}",
-              "title": "Pull request author"
-            },
-            {
-              "type": "string"
+              "description": "A string with `{{ variable }}` placeholders. Allowed variables: `author`.",
+              "format": "simple-template",
+              "title": "Bot account",
+              "type": "string",
+              "x-mergify-template-variables": [
+                {
+                  "description": "The pull request author's login.",
+                  "name": "author"
+                }
+              ]
             },
             {
               "type": "null"
@@ -3039,11 +4686,16 @@
         "bot_account": {
           "anyOf": [
             {
-              "const": "{{ author }}",
-              "title": "Pull request author"
-            },
-            {
-              "type": "string"
+              "description": "A string with `{{ variable }}` placeholders. Allowed variables: `author`.",
+              "format": "simple-template",
+              "title": "Bot account",
+              "type": "string",
+              "x-mergify-template-variables": [
+                {
+                  "description": "The pull request author's login.",
+                  "name": "author"
+                }
+              ]
             },
             {
               "type": "null"
@@ -3064,17 +4716,31 @@
       "title": "RebaseActionModel",
       "type": "object"
     },
+    "ReportMode": {
+      "enum": [
+        "check",
+        "comment"
+      ],
+      "title": "Report Mode",
+      "type": "string",
+      "x-mergify-has-data-type": true
+    },
     "RequestReviewsActionModel": {
       "additionalProperties": false,
       "properties": {
         "bot_account": {
           "anyOf": [
             {
-              "const": "{{ author }}",
-              "title": "Pull request author"
-            },
-            {
-              "type": "string"
+              "description": "A string with `{{ variable }}` placeholders. Allowed variables: `author`.",
+              "format": "simple-template",
+              "title": "Bot account",
+              "type": "string",
+              "x-mergify-template-variables": [
+                {
+                  "description": "The pull request author's login.",
+                  "name": "author"
+                }
+              ]
             },
             {
               "type": "null"
@@ -3096,7 +4762,7 @@
             }
           ],
           "default": null,
-          "description": "Pick random users and teams from the provided lists. When `random_count` is specified, `users` and `teams` can be a dictionary where the key is the login and the value is the weight to use. Weight must be between 1 and 15 included.",
+          "description": "Pick random users and teams from the provided lists. When `random_count` is specified, `users` and `teams` can be a dictionary where the key is the login and the value is the weight to use. Weight must be between 1 and 65535 included.",
           "title": "Random Count"
         },
         "users": {
@@ -3183,10 +4849,52 @@
         "message": {
           "anyOf": [
             {
-              "description": "A string template using the Jinja2 syntax.",
-              "format": "template",
-              "title": "Template",
-              "type": "string"
+              "description": "A string with `{{ variable }}` placeholders. Allowed variables: `approvers`, `assignees`, `author`, `base`, `body`, `head`, `labels`, `number`, `queue_dequeue_reason`, `title`.",
+              "format": "simple-template",
+              "title": "Message template",
+              "type": "string",
+              "x-mergify-template-variables": [
+                {
+                  "description": "The pull request author's login.",
+                  "name": "author"
+                },
+                {
+                  "description": "The pull request number.",
+                  "name": "number"
+                },
+                {
+                  "description": "The pull request title.",
+                  "name": "title"
+                },
+                {
+                  "description": "The pull request description (body).",
+                  "name": "body"
+                },
+                {
+                  "description": "The base branch name.",
+                  "name": "base"
+                },
+                {
+                  "description": "The head branch name.",
+                  "name": "head"
+                },
+                {
+                  "description": "The pull request's labels as a comma-separated list (e.g. `bug, feat`); empty when none.",
+                  "name": "labels"
+                },
+                {
+                  "description": "Assignees as a ready-to-use @mention list (e.g. `@alice, @bob`); empty when none.",
+                  "name": "assignees"
+                },
+                {
+                  "description": "Reviewers who approved, as a @mention list (e.g. `@alice, @bob`); empty when none.",
+                  "name": "approvers"
+                },
+                {
+                  "description": "Why the pull request left the merge queue; empty outside queue contexts.",
+                  "name": "queue_dequeue_reason"
+                }
+              ]
             },
             {
               "type": "null"
@@ -3199,11 +4907,16 @@
         "bot_account": {
           "anyOf": [
             {
-              "const": "{{ author }}",
-              "title": "Pull request author"
-            },
-            {
-              "type": "string"
+              "description": "A string with `{{ variable }}` placeholders. Allowed variables: `author`.",
+              "format": "simple-template",
+              "title": "Bot account",
+              "type": "string",
+              "x-mergify-template-variables": [
+                {
+                  "description": "The pull request author's login.",
+                  "name": "author"
+                }
+              ]
             },
             {
               "type": "null"
@@ -3241,6 +4954,18 @@
           "description": "Where scopes come from. `files` derives scopes from the pull request's changed files using file-pattern rules; `manual` uses scopes sent via API or `mergify scopes-send`; `None` disables scoping.",
           "title": "Source"
         },
+        "barrier_files": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BarrierFileFilters"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "File filters marking files that impact every scope. Only valid with a `files` source; a `manual` source reports the barrier flag via the API instead. A pull request changing a matching file becomes a merge-queue barrier: it runs alone and serializes the queue at that point. A renamed file counts at both of its paths, so moving a file out of a matching pattern is a barrier too. At least one `include` pattern is required. Examples: ('.github/workflows/**', 'Makefile')"
+        },
         "merge_queue_scope": {
           "default": "merge-queue",
           "description": "Scope name automatically applied to merge queue PRs.",
@@ -3250,7 +4975,7 @@
           "type": "string"
         },
         "capacities": {
-          "description": "How many speculative checks each scope may run at the same time, as a map of scope name to capacity. Works for any `source` (file globs or the manual scopes API just decide membership; capacity is declared here). A scope listed here runs against its own independent budget; a PR in several capped scopes consumes one slot from each. PRs whose scopes are all absent from this map share the repo-wide `merge_queue.max_parallel_checks` pool. Strict branch protection still forces an effective capacity of 1.",
+          "description": "How many speculative checks each scope may run at the same time, as a map of scope name to capacity. Works for any `source` (file globs or the manual scopes API just decide membership; capacity is declared here). A scope listed here runs against its own independent budget; a PR in several capped scopes consumes one slot from each. PRs whose scopes are all absent from this map share the repo-wide `merge_queue.max_parallel_checks` pool, unless `default_capacity` gives every scope a budget. Strict branch protection still forces an effective capacity of 1.",
           "patternProperties": {
             "^[A-Za-z0-9_-]+$": {
               "maximum": 128,
@@ -3264,6 +4989,21 @@
           },
           "title": "Capacities",
           "type": "object"
+        },
+        "default_capacity": {
+          "anyOf": [
+            {
+              "maximum": 128,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "How many speculative checks a scope without an explicit `capacities` entry may run at the same time. Applies to every scope observed on queued pull requests, so dynamic scope sets (e.g. sent by a monorepo build tool through the manual scopes API) get a per-scope budget without enumerating names; an explicit `capacities` entry still wins for its scope. `merge_queue.max_parallel_checks` remains the global ceiling on the total. When unset, scopes without a `capacities` entry are unlimited, and pull requests with no scopes always draw from the repo-wide pool. Strict branch protection still forces an effective capacity of 1.",
+          "title": "Default Capacity"
         }
       },
       "title": "Scopes",
@@ -3313,11 +5053,16 @@
         "bot_account": {
           "anyOf": [
             {
-              "const": "{{ author }}",
-              "title": "Pull request author"
-            },
-            {
-              "type": "string"
+              "description": "A string with `{{ variable }}` placeholders. Allowed variables: `author`.",
+              "format": "simple-template",
+              "title": "Bot account",
+              "type": "string",
+              "x-mergify-template-variables": [
+                {
+                  "description": "The pull request author's login.",
+                  "name": "author"
+                }
+              ]
             },
             {
               "type": "null"
@@ -3348,11 +5093,16 @@
         "bot_account": {
           "anyOf": [
             {
-              "const": "{{ author }}",
-              "title": "Pull request author"
-            },
-            {
-              "type": "string"
+              "description": "A string with `{{ variable }}` placeholders. Allowed variables: `author`.",
+              "format": "simple-template",
+              "title": "Bot account",
+              "type": "string",
+              "x-mergify-template-variables": [
+                {
+                  "description": "The pull request author's login.",
+                  "name": "author"
+                }
+              ]
             },
             {
               "type": "null"
