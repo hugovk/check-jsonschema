@@ -613,10 +613,10 @@
           "description": "All explicitly defined dependencies."
         },
         "indirect": {
-          "description": "Dependencies of direct dependencies (also known as sub-dependencies, or transient dependencies)."
+          "description": "Dependencies of direct dependencies (also known as sub-dependencies, or transitive dependencies). Supported by bundler, pip, composer, cargo, gomod, and uv."
         },
         "all": {
-          "description": "All explicitly defined dependencies. For bundler, pip, composer, cargo, also the dependencies of direct dependencies."
+          "description": "All explicitly defined dependencies. For bundler, pip, composer, cargo, gomod, and uv, also the dependencies of direct dependencies."
         },
         "production": {
           "description": "Only dependencies in the 'Product dependency group'."
@@ -700,11 +700,70 @@
         "pre-commit",
         "pub",
         "rust-toolchain",
+        "sbt",
         "swift",
         "terraform",
         "uv",
         "vcpkg"
       ]
+    },
+    "pull-request-branch-name": {
+      "description": "How Dependabot generates branch names for pull requests",
+      "type": "object",
+      "properties": {
+        "separator": {
+          "description": "Specify a character to use in place of / between branch name segments.",
+          "type": "string",
+          "default": "/",
+          "enum": ["-", "_", "/"]
+        },
+        "prefix": {
+          "description": "A custom string to use at the start of the branch name instead of the default.",
+          "type": "string",
+          "default": "dependabot",
+          "minLength": 1,
+          "maxLength": 50
+        },
+        "max-length": {
+          "description": "The maximum allowed length for generated branch names. When a branch name exceeds this limit, it is truncated and a hash suffix is appended to preserve uniqueness",
+          "type": "integer",
+          "default": 100,
+          "minimum": 20,
+          "maximum": 244
+        },
+        "word-separator": {
+          "description": "A character to replace underscores (_) in all branch name content after the prefix—including package manager names, dependency names, group names, and directory paths.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1
+        },
+        "branch-name-case": {
+          "description": "The case to use for all branch name content after the prefix—including package manager names, dependency names, group names, and directory paths.",
+          "type": "string",
+          "enum": ["lowercase", "uppercase"]
+        },
+        "template": {
+          "description": "A custom branch name format using placeholders.",
+          "type": "string",
+          "minLength": 1,
+          "allOf": [
+            {
+              "description": "Must not contain spaces, ~, ^, :, ?, *, [ or \\.",
+              "not": { "pattern": "[ ~^:?*\\[\\\\]" }
+            },
+            {
+              "description": "Must not contain '..'.",
+              "not": { "pattern": "\\.\\." }
+            },
+            {
+              "description": "Must not contain '@{'.",
+              "not": { "pattern": "@\\{" }
+            }
+          ]
+        }
+      },
+      "minProperties": 1,
+      "additionalProperties": false
     },
     "schedule-day": {
       "type": "string",
@@ -753,9 +812,19 @@
             },
             "anyOf": [
               {
+                "properties": {
+                  "dependency-name": {
+                    "$ref": "#/definitions/update/properties/allow/items/properties/dependency-name"
+                  }
+                },
                 "required": ["dependency-name"]
               },
               {
+                "properties": {
+                  "dependency-type": {
+                    "$ref": "#/definitions/dependency-type"
+                  }
+                },
                 "required": ["dependency-type"]
               }
             ],
@@ -789,18 +858,32 @@
             "include": {
               "description": "Specifies that any prefix is followed by a list of the dependencies updated in the commit.",
               "type": "string",
-              "enum": ["scope"],
-              "default": "scope"
+              "const": "scope"
             }
           },
           "anyOf": [
             {
+              "properties": {
+                "prefix": {
+                  "$ref": "#/definitions/update/properties/commit-message/properties/prefix"
+                }
+              },
               "required": ["prefix"]
             },
             {
+              "properties": {
+                "prefix-development": {
+                  "$ref": "#/definitions/update/properties/commit-message/properties/prefix-development"
+                }
+              },
               "required": ["prefix-development"]
             },
             {
+              "properties": {
+                "include": {
+                  "$ref": "#/definitions/update/properties/commit-message/properties/include"
+                }
+              },
               "required": ["include"]
             }
           ],
@@ -926,7 +1009,7 @@
               "group-by": {
                 "description": "Configure how dependencies are grouped within this group.",
                 "type": "string",
-                "enum": ["dependency-name"]
+                "const": "dependency-name"
               }
             },
             "additionalProperties": false
@@ -966,12 +1049,27 @@
             },
             "anyOf": [
               {
+                "properties": {
+                  "dependency-name": {
+                    "$ref": "#/definitions/update/properties/ignore/items/properties/dependency-name"
+                  }
+                },
                 "required": ["dependency-name"]
               },
               {
+                "properties": {
+                  "update-types": {
+                    "$ref": "#/definitions/update/properties/ignore/items/properties/update-types"
+                  }
+                },
                 "required": ["update-types"]
               },
               {
+                "properties": {
+                  "versions": {
+                    "$ref": "#/definitions/update/properties/ignore/items/properties/versions"
+                  }
+                },
                 "required": ["versions"]
               }
             ],
@@ -1024,18 +1122,7 @@
           ]
         },
         "pull-request-branch-name": {
-          "description": "Pull request branch name preferences",
-          "type": "object",
-          "properties": {
-            "separator": {
-              "description": "Change separator for PR branch name",
-              "type": "string",
-              "default": "/",
-              "enum": ["-", "_", "/"]
-            }
-          },
-          "required": ["separator"],
-          "additionalProperties": false
+          "$ref": "#/definitions/pull-request-branch-name"
         },
         "rebase-strategy": {
           "description": "Disable automatic rebasing. 'auto' is the default and Dependabot will rebase open pull requests when changes are detected. 'disabled' will disable automatic rebasing.",
@@ -1080,12 +1167,9 @@
             "timezone": {
               "$ref": "#/definitions/timezone",
               "description": "The time zone identifier must be from the Time Zone database maintained by IANA"
-            },
-            "cronjob": {
-              "type": "string",
-              "description": "Specify a valid cron expression for updates"
             }
           },
+          "required": ["interval"],
           "allOf": [
             {
               "$comment": "If interval type is 'cron', enforce 'cronjob' property.",
@@ -1097,10 +1181,13 @@
                 }
               },
               "then": {
-                "required": ["interval", "cronjob"]
-              },
-              "else": {
-                "required": ["interval"]
+                "properties": {
+                  "cronjob": {
+                    "type": "string",
+                    "description": "Specify a valid cron expression for updates"
+                  }
+                },
+                "required": ["cronjob"]
               }
             }
           ]
@@ -1134,37 +1221,46 @@
           "minLength": 1
         }
       },
+      "required": ["package-ecosystem"],
       "allOf": [
         {
           "$comment": "Schedule is required UNLESS multi-ecosystem-group is specified",
           "if": {
-            "required": ["multi-ecosystem-group"]
+            "not": {
+              "properties": {
+                "multi-ecosystem-group": {}
+              },
+              "required": ["multi-ecosystem-group"]
+            }
           },
           "then": {
-            "required": ["package-ecosystem"]
-          },
-          "else": {
-            "required": ["package-ecosystem", "schedule"]
+            "properties": {
+              "schedule": {
+                "$ref": "#/definitions/update/properties/schedule"
+              }
+            },
+            "required": ["schedule"]
           }
         },
         {
           "oneOf": [
             {
+              "properties": {
+                "directories": {
+                  "$ref": "#/definitions/update/properties/directories"
+                }
+              },
               "required": ["directories"]
             },
             {
+              "properties": {
+                "directory": {
+                  "$ref": "#/definitions/update/properties/directory"
+                }
+              },
               "required": ["directory"]
             }
           ]
-        },
-        {
-          "$comment": "If multi-ecosystem-group is specified, patterns is required",
-          "if": {
-            "required": ["multi-ecosystem-group"]
-          },
-          "then": {
-            "required": ["patterns"]
-          }
         }
       ]
     },
@@ -1218,6 +1314,25 @@
           "replaces-base": {
             "description": "For registries with type: python-index, if the boolean value is true, pip resolves dependencies by using the specified URL rather than the base URL of the Python Package Index (by default https://pypi.org/simple).",
             "type": "boolean"
+          },
+          "scope": {
+            "$comment": "'scope' must be either a single npm scope, or an array of them.",
+            "description": "For registries with type: npm-registry, the npm scope or scopes served by this registry, for example '@my-org'. Dependabot binds only the listed scopes to this registry when generating the .npmrc, so packages outside those scopes continue to resolve from the base registry. This value takes precedence over scope inference from an existing .npmrc or from the lockfile.",
+            "oneOf": [
+              {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "uniqueItems": true,
+                "minItems": 1
+              },
+              {
+                "type": "string",
+                "minLength": 1
+              }
+            ]
           },
           "organization": {
             "description": "",
@@ -1308,12 +1423,9 @@
             "timezone": {
               "$ref": "#/definitions/timezone",
               "description": "The time zone identifier must be from the Time Zone database maintained by IANA"
-            },
-            "cronjob": {
-              "type": "string",
-              "description": "Specify a valid cron expression for updates"
             }
           },
+          "required": ["interval"],
           "allOf": [
             {
               "$comment": "If interval type is 'cron', enforce 'cronjob' property.",
@@ -1325,10 +1437,13 @@
                 }
               },
               "then": {
-                "required": ["interval", "cronjob"]
-              },
-              "else": {
-                "required": ["interval"]
+                "properties": {
+                  "cronjob": {
+                    "type": "string",
+                    "description": "Specify a valid cron expression for updates"
+                  }
+                },
+                "required": ["cronjob"]
               }
             }
           ]
@@ -1380,35 +1495,39 @@
             "include": {
               "description": "Specifies that any prefix is followed by a list of the dependencies updated in the commit",
               "type": "string",
-              "enum": ["scope"]
+              "const": "scope"
             }
           },
           "anyOf": [
             {
+              "properties": {
+                "prefix": {
+                  "$ref": "#/definitions/multi-ecosystem-group/properties/commit-message/properties/prefix"
+                }
+              },
               "required": ["prefix"]
             },
             {
+              "properties": {
+                "prefix-development": {
+                  "$ref": "#/definitions/multi-ecosystem-group/properties/commit-message/properties/prefix-development"
+                }
+              },
               "required": ["prefix-development"]
             },
             {
+              "properties": {
+                "include": {
+                  "$ref": "#/definitions/multi-ecosystem-group/properties/commit-message/properties/include"
+                }
+              },
               "required": ["include"]
             }
           ],
           "additionalProperties": false
         },
         "pull-request-branch-name": {
-          "description": "Pull request branch name preferences for the group",
-          "type": "object",
-          "properties": {
-            "separator": {
-              "description": "Change separator for PR branch name",
-              "type": "string",
-              "default": "/",
-              "enum": ["-", "_", "/"]
-            }
-          },
-          "required": ["separator"],
-          "additionalProperties": false
+          "$ref": "#/definitions/pull-request-branch-name"
         },
         "open-pull-requests-limit": {
           "description": "Limit number of open pull requests for version updates.",
@@ -1450,7 +1569,7 @@
       "title": "Config file version",
       "description": "Dependabot configuration files require this key, and its value must be 2",
       "type": "integer",
-      "enum": [2]
+      "const": 2
     },
     "enable-beta-ecosystems": {
       "description": "Enable ecosystems that have beta-level support",
@@ -1478,6 +1597,7 @@
   },
   "required": ["version", "updates"],
   "title": "GitHub Dependabot v2 config",
+  "description": "Schema for GitHub dependabot.yml configuration files using the v2 format.",
   "type": "object",
   "allOf": [
     {
@@ -1494,7 +1614,9 @@
       "else": {
         "properties": {
           "updates": {
+            "type": "array",
             "items": {
+              "type": "object",
               "properties": {
                 "package-ecosystem": {
                   "$ref": "#/definitions/package-ecosystem-values"
